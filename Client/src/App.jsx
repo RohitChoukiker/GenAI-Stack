@@ -1,14 +1,15 @@
-import { useState } from 'react'
+import { Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
+import Stacks from "./pages/Stacks";
+import Builder from "./pages/Builder";
 
-
-function App() {
-
-
+export default function App() {
   return (
-    <div className="min-h-screen bg-green-500 flex items-center justify-center">
-      <h1 className="text-4xl font-bold text-white">Hello World</h1>
-    </div>
-  )
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Stacks />} />
+        <Route path="/builder" element={<Builder />} />
+      </Routes>
+    </Layout>
+  );
 }
-
-export default App
