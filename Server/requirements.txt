@@ -3,3 +3,10 @@ uvicorn
 sqlalchemy
 psycopg2-binary
 python-dotenv
+pydantic
+chromadb
+pypdf2
+openai
+langchain 
+langchain-community 
+langchain-openai 

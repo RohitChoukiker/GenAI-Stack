@@ -21,3 +21,4 @@ def save_stack_canvas(
 @router.get("/{stack_id}/canvas", tags=["Stack Canvas"])
 def get_stack_canvas(stack_id: int, db: Session = Depends(get_db)):
     return get_canvas_service(stack_id=stack_id,db=db)
+
