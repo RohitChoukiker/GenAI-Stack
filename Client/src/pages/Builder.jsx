@@ -6,7 +6,10 @@ import ReactFlow, {
   Background,
   useNodesState,
   useEdgesState,
-  useReactFlow,useStore
+  useReactFlow,
+  useStore,
+  ConnectionLineType,
+  BezierEdge,
 } from "reactflow";
 import "reactflow/dist/style.css";
 
@@ -25,9 +28,14 @@ const nodeTypes = {
   outputNode: OutputNode,
 };
 
+
+const edgeTypes = {
+  bezier: BezierEdge,
+};
+
+/* ---------------- CUSTOM CONTROLS ---------------- */
 function CustomControls() {
   const { zoomIn, zoomOut, fitView, setViewport } = useReactFlow();
-
   const zoom = useStore((state) => state.transform[2]);
 
   const handleZoomChange = (e) => {
@@ -36,64 +44,17 @@ function CustomControls() {
   };
 
   return (
-    <div
-      className="
-        absolute
-        bottom-4
-        left-1/2
-        -translate-x-1/2
-        z-50
-        bg-white
-        rounded-[10px]
-        shadow-[0_4px_16px_rgba(0,0,0,0.12)]
-        flex
-        items-center
-        overflow-hidden
-      "
-    >
-      
-      <button
-        onClick={zoomIn}
-        className="px-3 py-2 hover:bg-gray-100 text-lg"
-      >
-        +
-      </button>
-
+    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 bg-white rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.12)] flex items-center overflow-hidden">
+      <button onClick={zoomIn} className="px-3 py-2 hover:bg-gray-100 text-lg">+</button>
       <div className="w-px h-6 bg-gray-200" />
-
-     
-      <button
-        onClick={zoomOut}
-        className="px-3 py-2 hover:bg-gray-100 text-lg"
-      >
-        −
-      </button>
-
+      <button onClick={zoomOut} className="px-3 py-2 hover:bg-gray-100 text-lg">−</button>
       <div className="w-px h-6 bg-gray-200" />
-
-     
-      <button
-        onClick={fitView}
-        className="px-3 py-2 hover:bg-gray-100"
-        title="Fit View"
-      >
-        ⤢
-      </button>
-
+      <button onClick={fitView} className="px-3 py-2 hover:bg-gray-100">⤢</button>
       <div className="w-px h-6 bg-gray-200" />
-
-      
       <select
         value={Number(zoom.toFixed(2))}
         onChange={handleZoomChange}
-        className="
-          px-3
-          py-2
-          text-sm
-          bg-transparent
-          focus:outline-none
-          cursor-pointer
-        "
+        className="px-3 py-2 text-sm bg-transparent focus:outline-none cursor-pointer"
       >
         <option value={0.5}>50%</option>
         <option value={0.75}>75%</option>
@@ -104,19 +65,17 @@ function CustomControls() {
   );
 }
 
+
 export default function Builder() {
   const [searchParams] = useSearchParams();
   const stackId = searchParams.get("stackId");
-  const { loadStack, currentStack } = useStack();
+  const { loadStack } = useStack();
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  
   useEffect(() => {
-    if (stackId) {
-      loadStack(stackId);
-    }
+    if (stackId) loadStack(stackId);
   }, [stackId, loadStack]);
 
 
@@ -126,8 +85,8 @@ export default function Builder() {
         addEdge(
           {
             ...params,
-            type: "smoothstep",
-            offset: 50,
+            type: "bezier",
+            curvature: 0.45,
           },
           eds
         )
@@ -135,10 +94,8 @@ export default function Builder() {
     []
   );
 
-
   const onDrop = (event) => {
     event.preventDefault();
-
     const type = event.dataTransfer.getData("nodeType");
 
     const position = {
@@ -146,14 +103,14 @@ export default function Builder() {
       y: event.clientY - 120,
     };
 
-    const newNode = {
-      id: `${Date.now()}`,
-      type,
-      position,
-      data: {},
-    };
-
-    setNodes((nds) => nds.concat(newNode));
+    setNodes((nds) =>
+      nds.concat({
+        id: `${Date.now()}`,
+        type,
+        position,
+        data: {},
+      })
+    );
   };
 
   const onDragOver = (event) => {
@@ -163,9 +120,7 @@ export default function Builder() {
 
   return (
     <div className="flex flex-col sm:flex-row h-full overflow-hidden">
-  
       <Sidebar />
-
 
       <div
         className="flex-1 bg-[#F1F5F9] w-full min-h-0 relative"
@@ -173,21 +128,22 @@ export default function Builder() {
         onDragOver={onDragOver}
       >
         <ReactFlow
-  nodes={nodes}
-  edges={edges}
-  nodeTypes={nodeTypes}
-  onNodesChange={onNodesChange}
-  onEdgesChange={onEdgesChange}
-  onConnect={onConnect}
-  defaultViewport={{ x: 0, y: 0, zoom: 1 }} 
->
-       
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}              
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          connectionLineType={ConnectionLineType.Bezier} 
+          defaultEdgeOptions={{
+            type: "bezier",
+            curvature: 0.45,
+          }}
+          defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+        >
           <MiniMap className="!bottom-2 !right-2 !w-24 !h-20 sm:!w-32 sm:!h-24" />
-
-        
           <Background gap={16} />
-
-          
           <CustomControls />
         </ReactFlow>
       </div>
