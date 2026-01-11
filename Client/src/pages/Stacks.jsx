@@ -2,19 +2,14 @@ import { useState } from "react";
 import StackCard from "../components/StackCard";
 import CreateStackModal from "../components/CreateStackModal";
 import CreateStackFormModal from "../components/CreateStackFormModal";
+import { useStack } from "../context/StackContext";
 
 export default function Stacks() {
-  const [stacks, setStacks] = useState([]);
+  const { stacks, createStack } = useStack();
   const [openCreateForm, setOpenCreateForm] = useState(false);
 
   const handleCreateStack = (newStack) => {
-    setStacks((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        ...newStack,
-      },
-    ]);
+    createStack(newStack);
   };
 
   return (
@@ -45,7 +40,7 @@ export default function Stacks() {
 
       {/* STACK LIST */}
       {stacks.length > 0 && (
-        <div className="flex gap-4 flex-wrap">
+        <div className="flex gap-4  mt-6 flex-wrap">
           {stacks.map((stack) => (
             <StackCard key={stack.id} stack={stack} />
           ))}
