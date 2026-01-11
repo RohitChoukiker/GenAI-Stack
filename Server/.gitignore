@@ -3,3 +3,5 @@
 /models/__pycache__/
 /routers/__pycache__/
 .env
+/services/__pycache__/
+/DTO/__pycache__/
