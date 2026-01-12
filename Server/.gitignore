@@ -5,3 +5,12 @@
 .env
 /services/__pycache__/
 /DTO/__pycache__/
+/utils/__pycache__/
+
+chroma_db/
+Server/chroma_db/
+
+
+.DS_Store
+.vscode/
+.idea/

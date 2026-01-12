@@ -21,6 +21,11 @@ SessionLocal = sessionmaker(
 )
 
 Base = declarative_base()
+def init_db():
+    from models import stack_model, canvas_model 
+    Base.metadata.create_all(bind=engine)
+
+init_db()
 
 def get_db():
     db = SessionLocal()

@@ -4,6 +4,7 @@ from db import engine, Base
 from routers import stack_router
 from routers import canvas_router
 from routers import kb_router
+from routers.run_router import router as run_router
 
 app = FastAPI(title="GenAI-Stack API")
 
@@ -25,6 +26,7 @@ async def startup_event():
     app.include_router(stack_router.router, prefix="/api")
     app.include_router(canvas_router.router, prefix="/api")
     app.include_router(kb_router.router, prefix="/api")
+    app.include_router(run_router, prefix="/api")
 
 if __name__ == "__main__":
     uvicorn.run(
