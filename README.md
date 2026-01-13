@@ -72,6 +72,7 @@ It is built using **FastAPI** and follows a **controller–service architecture*
 ### Backend Setup & Installation
 
 ```bash
+git clone https://github.com/RohitChoukiker/GenAI-Stack.git
 cd Server
 pip install -r requirements.txt
 uvicorn main:app --reload
