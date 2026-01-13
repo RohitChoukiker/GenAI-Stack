@@ -55,7 +55,7 @@ def run_stack_service(
         .replace("{query}", query)
     )
 
-    # 5. Call LLM
+    
     client = OpenAI(api_key=api_key)
 
     response = client.chat.completions.create(
