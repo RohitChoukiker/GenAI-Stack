@@ -38,3 +38,41 @@ git clone https://github.com/RohitChoukiker/GenAI-Stack.git
 cd Client
 npm install
 npm run dev
+```
+
+
+## Backend Overview
+
+The backend provides APIs to manage AI stacks, canvases, and knowledge bases.  
+It is built using **FastAPI** and follows a **controller–service architecture** to ensure clean separation of concerns and scalability.
+
+---
+
+### Backend Responsibilities
+- Handle API requests from the frontend  
+- Manage stack and canvas creation  
+- Process knowledge base document uploads  
+- Generate embeddings and store them in a vector database  
+- Execute RAG-based workflows  
+- Communicate with the LLM provider and return responses  
+
+---
+
+### Backend Tech Stack
+- Language: Python  
+- Framework: FastAPI  
+- Server: Uvicorn  
+- Database: SQLAlchemy + PostgreSQL  
+- Vector Database: ChromaDB  
+- LLM: OpenAI  
+- Embedding Model: Sentence-Transformers (all-MiniLM-L6-v2)  
+
+---
+
+### Backend Setup & Installation
+
+```bash
+cd Server
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
