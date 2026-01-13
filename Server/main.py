@@ -1,12 +1,24 @@
 from fastapi import FastAPI
 import uvicorn
 from db import engine, Base
+from fastapi.middleware.cors import CORSMiddleware
 from routers import stack_router
 from routers import canvas_router
 from routers import kb_router
 from routers.run_router import router as run_router
 
 app = FastAPI(title="GenAI-Stack API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173", 
+        "http://localhost:3000",  
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 async def read_root():

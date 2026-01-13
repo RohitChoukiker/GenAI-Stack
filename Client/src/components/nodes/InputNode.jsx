@@ -1,17 +1,17 @@
 import { Handle, Position } from "reactflow";
 import { useState, useEffect } from "react";
 
-export default function InputNode({ data }) {
+export default function InputNode({ id, data }) {
   const [query, setQuery] = useState(data?.query || "");
 
   useEffect(() => {
-    data?.onChange?.(query);
+    data?.onChange?.({
+      query,
+    });
   }, [query]);
 
   return (
     <div className="relative">
-
-      
       <div
         className="
           w-[303px]
@@ -23,7 +23,6 @@ export default function InputNode({ data }) {
           overflow-hidden
         "
       >
-
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#E6EAF0]">
           <div className="flex items-center gap-2 text-[18px] font-semibold">
             <img src="/images/entry-image.png" className="w-[18px] h-[18px]" />
@@ -36,7 +35,6 @@ export default function InputNode({ data }) {
           Enter point for queries
         </div>
 
-   
         <div className="px-4 pt-4">
           <div className="text-[18px] mb-2">User Query</div>
 
@@ -51,27 +49,26 @@ export default function InputNode({ data }) {
         </div>
       </div>
 
+      <div className="absolute right-[1px] bottom-[14px] flex items-center">
+        <div className="text-[14px] leading-[17px] mr-4">
+          Query
+        </div>
 
-<div className="absolute right-[1px] bottom-[14px] flex items-center">
-  <div className="text-[14px] leading-[17px] mr-4">
-    Query
-  </div>
-
-  <Handle
-    type="source"
-    position={Position.Right}
-    className="
-      !w-[12px]
-      !h-[12px]
-      !bg-[#FFC64C]
-      !border-[3px]
-      !border-white
-      !m-0
-    "
-  />
-</div>
-
-
+      
+        <Handle
+          id="query"
+          type="source"
+          position={Position.Right}
+          className="
+            !w-[12px]
+            !h-[12px]
+            !bg-[#FFC64C]
+            !border-[3px]
+            !border-white
+            !m-0
+          "
+        />
+      </div>
     </div>
   );
 }

@@ -1,10 +1,93 @@
-import { useState } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import { Handle, Position } from "reactflow";
 import { Eye, EyeOff } from "lucide-react";
+import { useStack } from "../../context/StackContext";
+import { uploadKnowledgeBaseApi } from "../../api/stackApi";
+
 
 export default function KnowledgeBaseNode() {
   const [showKey, setShowKey] = useState(false);
   const [apiKey, setApiKey] = useState("");
+  const [file, setFile] = useState(null);
+  const [embeddingModel, setEmbeddingModel] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const { currentStack } = useStack();
+  
+  const lastUploadedRef = useRef({ name: null, size: null, stackId: null, model: null, apiKey: null });
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0] || null);
+    setSuccess("");
+    setError("");
+  };
+
+  const handleModelChange = (e) => {
+    setEmbeddingModel(e.target.value);
+    setSuccess("");
+    setError("");
+  };
+
+
+
+  const intervalRef = useRef(null);
+
+  const uploadIfReady = async () => {
+    if (!currentStack?.id || !file || !embeddingModel || !apiKey) return;
+   
+    const last = lastUploadedRef.current;
+    if (
+      last.name === file.name &&
+      last.size === file.size &&
+      last.stackId === currentStack.id &&
+      last.model === embeddingModel &&
+      last.apiKey === apiKey
+    ) {
+    
+      return;
+    }
+    setUploading(true);
+    setError("");
+    setSuccess("");
+    try {
+      await uploadKnowledgeBaseApi({
+        stackId: currentStack.id,
+        file,
+        embeddingModel,
+        apiKey,
+      });
+      setSuccess("Knowledge base uploaded!");
+      lastUploadedRef.current = {
+        name: file.name,
+        size: file.size,
+        stackId: currentStack.id,
+        model: embeddingModel,
+        apiKey: apiKey,
+      };
+    } catch (err) {
+      setError("Upload failed. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  
+  useEffect(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (file && embeddingModel && apiKey && currentStack?.id) {
+      
+      uploadIfReady();
+      intervalRef.current = setInterval(() => {
+        uploadIfReady();
+      }, 5 * 60 * 1000); 
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  
+  }, [file, embeddingModel, apiKey, currentStack?.id]);
 
   return (
     <div className="relative w-[303px]">
@@ -27,28 +110,34 @@ export default function KnowledgeBaseNode() {
 
 
         <div className="px-4 py-4 space-y-4">
-     
           <div>
             <div className="text-[16px] mb-2">File for Knowledge Base</div>
-            <div className="h-[64px] border border-dashed border-[#4CAF50] rounded-[8px] flex items-center justify-center gap-3 text-[#4CAF50] text-[18px] cursor-pointer">
-              Upload File
+            <label className="h-[64px] border border-dashed border-[#4CAF50] rounded-[8px] flex items-center justify-center gap-3 text-[#4CAF50] text-[18px] cursor-pointer">
+              {file ? file.name : "Upload File"}
               <img src="/images/upload-image.png" className="w-4 h-4" />
-            </div>
+              <input
+                type="file"
+                accept=".pdf"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+            </label>
           </div>
-
-          
           <div>
             <div className="text-[16px] mb-2">Embedding Model</div>
-            <select className="w-full h-[44px] border border-[rgba(0,0,0,0.3)] rounded-[8px] px-3 text-[16px] bg-white">
-              <option>gpt-4o</option>
-              <option>gpt-4.1</option>
-              <option>gpt-4-turbo</option>
-              <option>o3</option>
-              <option>o3-mini</option>
+            <select
+              className="w-full h-[44px] border border-[rgba(0,0,0,0.3)] rounded-[8px] px-3 text-[16px] bg-white"
+              value={embeddingModel}
+              onChange={handleModelChange}
+            >
+              <option value="">Select Model</option>
+              <option value="gpt-4o">gpt-4o</option>
+              <option value="gpt-4.1">gpt-4.1</option>
+              <option value="gpt-4-turbo">gpt-4-turbo</option>
+              <option value="o3">o3</option>
+              <option value="o3-mini">o3-mini</option>
             </select>
           </div>
-
-    
           <div>
             <div className="text-[16px] mb-2">API Key</div>
             <div className="relative">
@@ -66,7 +155,12 @@ export default function KnowledgeBaseNode() {
                 {showKey ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
+     
+            {uploading && <div className="text-green-500 text-sm mt-2">Uploading...</div>}
+            {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+            {success && <div className="text-green-600 text-sm mt-2">{success}</div>}
           </div>
+
         </div>
       </div>
 
@@ -74,13 +168,13 @@ export default function KnowledgeBaseNode() {
       <Handle
   type="target"
   position={Position.Left}
-  style={{ top: "82%" }}  
+  style={{ top: "84%" }}  
   className="!w-[12px] !h-[12px] !bg-[#FF7A38] !border-[3px] !border-white"
 />
 
 <div
   className="absolute left-[34px] text-[14px]"
-  style={{ top: "79.7%", transform: "translate(-58%)" }}  
+  style={{ top: "81.7%", transform: "translate(-58%)" }}  
 >
   Query
 </div>
