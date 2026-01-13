@@ -16,7 +16,7 @@ export default function StackCard({ stack }) {
     <div
       className="
         bg-white
-        w-[311px]
+        w-[300px]
         h-[168px]
         rounded-xl
         border border-[#E4E8EE]

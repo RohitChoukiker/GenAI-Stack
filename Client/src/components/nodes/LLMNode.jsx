@@ -1,25 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Handle, Position } from "reactflow";
 import { Eye, EyeOff } from "lucide-react";
 
-export default function LLMNode({ data }) {
+export default function LLMNode({ id, data }) {
+
+  data = data || {};
   const [showApiKey, setShowApiKey] = useState(false);
   const [showSerpKey, setShowSerpKey] = useState(false);
+  const [model, setModel] = useState(data.model || "GPT 4o - Mini");
+  const [apiKey, setApiKey] = useState(data.apiKey || "");
+  const [temperature, setTemperature] = useState(data.temperature || 0.75);
+  const [prompt, setPrompt] = useState(data.prompt || "");
+  const [serpKey, setSerpKey] = useState(data.serpKey || "");
+  const [webSearch, setWebSearch] = useState(data.webSearch || false);
+
+  useEffect(() => {
+    data.onChange?.({ model, apiKey, temperature, prompt, serpKey, webSearch });
+  }, [model, apiKey, temperature, prompt, serpKey, webSearch]);
 
   return (
     <div className="relative">
       <div
-        className="
-          w-[303px]
-          h-[730px]
-          bg-white
-          rounded-[8px]
-          border border-[#E6EAF0]
-          shadow-[0_8px_24px_rgba(0,0,0,0.08)]
-          overflow-hidden
-        "
+        className="w-[303px] h-[730px] bg-white rounded-[8px] border border-[#E6EAF0] shadow-[0_8px_24px_rgba(0,0,0,0.08)] overflow-hidden"
       >
-        
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#E6EAF0]">
           <div className="flex items-center gap-2 text-[18px] font-semibold">
             <img src="/nodes/llm.png" className="w-[18px] h-[18px]" />
@@ -27,30 +30,29 @@ export default function LLMNode({ data }) {
           </div>
           <img src="/images/Setting-image.png" className="w-[18px] h-[18px]" />
         </div>
-
-        
         <div className="h-[38px] bg-[#EDF3FF] flex items-center px-4 text-[16px]">
           Run a query with OpenAI LLM
         </div>
-
-       
         <div className="px-4 py-4 space-y-4">
-         
           <div>
             <div className="text-[14px] mb-1">Model</div>
-            <select className="w-full h-[44px] border border-[#0000004D] rounded-[8px] px-3 text-[16px] bg-white">
+            <select
+              value={model}
+              onChange={e => setModel(e.target.value)}
+              className="w-full h-[44px] border border-[#0000004D] rounded-[8px] px-3 text-[16px] bg-white"
+            >
               <option>GPT 4o - Mini</option>
               <option>GPT 4o</option>
               <option>GPT 4.1</option>
             </select>
           </div>
-
-         
           <div>
             <div className="text-[14px] mb-1">API Key</div>
             <div className="relative">
               <input
                 type={showApiKey ? "text" : "password"}
+                value={apiKey}
+                onChange={e => setApiKey(e.target.value)}
                 placeholder="****************"
                 className="w-full h-[44px] border border-[#0000004D] rounded-[8px] px-3 pr-10 text-[16px]"
               />
@@ -63,8 +65,6 @@ export default function LLMNode({ data }) {
               </button>
             </div>
           </div>
-
-       
           <div className="h-[147.18px]">
             <div className="text-[14px] mb-1">Prompt</div>
             <div className="w-[271px] h-[119px] border border-[#0000004D] rounded-[8px] px-3 py-2 text-[14px] leading-[20px]">
@@ -88,33 +88,39 @@ export default function LLMNode({ data }) {
               </p>
             </div>
           </div>
-
-       
           <div>
             <div className="text-[14px] mb-1">Temperature</div>
-            <select className="w-full h-[44px] border border-[#0000004D] rounded-[8px] px-3 text-[16px] bg-white">
-              <option>0.75</option>
+            <select
+              value={temperature}
+              onChange={e => setTemperature(Number(e.target.value))}
+              className="w-full h-[44px] border border-[#0000004D] rounded-[8px] px-3 text-[16px] bg-white"
+            >
+              <option value={0.75}>0.75</option>
+              <option value={1}>1</option>
+              <option value={0.5}>0.5</option>
             </select>
           </div>
-
-         
           <div className="flex items-center justify-between">
             <div className="text-[14px]">WebSearch Tool</div>
             <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" defaultChecked className="sr-only peer" />
+              <input
+                type="checkbox"
+                checked={webSearch}
+                onChange={e => setWebSearch(e.target.checked)}
+                className="sr-only peer"
+              />
               <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-500 transition-all" />
               <div className="absolute left-[2px] top-[2px] w-5 h-5 bg-white rounded-full transition-all peer-checked:translate-x-5" />
             </label>
           </div>
-
           <div className="h-[1px] bg-[#D9D9D9]" />
-
-         
           <div>
             <div className="text-[14px] mb-1">SERF API</div>
             <div className="relative">
               <input
                 type={showSerpKey ? "text" : "password"}
+                value={serpKey}
+                onChange={e => setSerpKey(e.target.value)}
                 placeholder="Your SERP API Key"
                 className="w-full h-[44px] border border-[#0000004D] rounded-[8px] px-3 pr-10 text-[16px]"
               />
@@ -129,8 +135,6 @@ export default function LLMNode({ data }) {
           </div>
         </div>
       </div>
-
-    
       <Handle
         id="query"
         type="target"
@@ -138,8 +142,6 @@ export default function LLMNode({ data }) {
         style={{ top: "50.1%" }}
         className="!w-[12px] !h-[12px] !bg-[#6344BE] !border-[3px] !border-white"
       />
-
-    
       <Handle
         id="context"
         type="target"
@@ -147,8 +149,6 @@ export default function LLMNode({ data }) {
         style={{ top: "54%" }}
         className="!w-[12px] !h-[12px] !bg-[#6344BE] !border-[3px] !border-white"
       />
-
-    
       <Handle
         id="output"
         type="source"
@@ -156,7 +156,6 @@ export default function LLMNode({ data }) {
         style={{ top: "94%" }}
         className="!w-[12px] !h-[12px] !bg-[#6344BE] !border-[3px] !border-white"
       />
-
       <div
         className="absolute right-[12px] text-[14px]"
         style={{ top: "94%", transform: "translateY(-50%)" }}

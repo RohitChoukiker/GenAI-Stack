@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000/api";
+export const BASE_URL = "http://localhost:8000/api";
 
 
 export async function createStackApi({ name, description }) {
@@ -13,9 +13,8 @@ export async function createStackApi({ name, description }) {
     throw new Error("Failed to create stack");
   }
   return response.json();
-}
 
-// ...existing code...
+}
 
 export async function uploadKnowledgeBaseApi({ stackId, file, embeddingModel, apiKey }) {
   const formData = new FormData();

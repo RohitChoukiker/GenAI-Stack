@@ -42,6 +42,7 @@ export default function CreateStackModal({ isOpen, onCreate }) {
               text-sm
               hover:bg-[#4f7d49]
               w-fit
+              cursor-pointer
             "
           >
             + New Stack

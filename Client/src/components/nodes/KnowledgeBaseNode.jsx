@@ -6,11 +6,32 @@ import { useStack } from "../../context/StackContext";
 import { uploadKnowledgeBaseApi } from "../../api/stackApi";
 
 
-export default function KnowledgeBaseNode() {
-  const [showKey, setShowKey] = useState(false);
-  const [apiKey, setApiKey] = useState("");
-  const [file, setFile] = useState(null);
-  const [embeddingModel, setEmbeddingModel] = useState("");
+export default function KnowledgeBaseNode({ id, data }) {
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [showSerpKey, setShowSerpKey] = useState(false);
+  const [model, setModel] = useState(data?.model || "GPT 4o - Mini");
+  const [apiKey, setApiKey] = useState(data?.apiKey || "");
+  const [temperature, setTemperature] = useState(data?.temperature || 0.75);
+  const [prompt, setPrompt] = useState(data?.prompt || "");
+  const [serpKey, setSerpKey] = useState(data?.serpKey || "");
+  const [webSearch, setWebSearch] = useState(data?.webSearch || false);
+  const [file, setFile] = useState(data?.file || null);
+  const [embeddingModel, setEmbeddingModel] = useState(data?.embeddingModel || "");
+  // Send all KB node data to parent on change
+  useEffect(() => {
+    data?.onChange?.({
+      embeddingModel,
+      apiKey,
+      file,
+      showApiKey,
+      showSerpKey,
+      model,
+      temperature,
+      prompt,
+      serpKey,
+      webSearch,
+    });
+  }, [embeddingModel, apiKey, file, showApiKey, showSerpKey, model, temperature, prompt, serpKey, webSearch]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -142,17 +163,17 @@ export default function KnowledgeBaseNode() {
             <div className="text-[16px] mb-2">API Key</div>
             <div className="relative">
               <input
-                type={showKey ? "text" : "password"}
+                type={showApiKey ? "text" : "password"}
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 className="w-full h-[44px] border border-[rgba(0,0,0,0.3)] rounded-[8px] px-3 pr-10 text-[16px]"
               />
               <button
                 type="button"
-                onClick={() => setShowKey(!showKey)}
+                onClick={() => setShowApiKey(!showApiKey)}
                 className="absolute right-3 top-1/2 -translate-y-1/2"
               >
-                {showKey ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showApiKey ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
      

@@ -1,9 +1,22 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { createStackApi, getAllStacksApi } from "../api/stackApi";
 
 const StackContext = createContext();
 
 export function StackProvider({ children }) {
   const [stacks, setStacks] = useState([]);
+
+  useEffect(() => {
+    async function fetchStacks() {
+      try {
+        const data = await getAllStacksApi();
+        setStacks(data.data); 
+      } catch (err) {
+        console.error("Failed to fetch stacks:", err);
+      }
+    }
+    fetchStacks();
+  }, []);
   const [currentStack, setCurrentStack] = useState(null);
 
  
@@ -15,13 +28,15 @@ export function StackProvider({ children }) {
   };
 
 
-  const createStack = (stackData) => {
-    const newStack = {
-      id: stacks.length + 1,
-      ...stackData,
-    };
-    setStacks((prev) => [...prev, newStack]);
-    return newStack;
+  const createStack = async (stackData) => {
+    try {
+      const response = await createStackApi(stackData);
+     
+      setStacks((prev) => [...prev, response.data]);
+      return response.data;
+    } catch (error) {
+          throw error;
+    }
   };
 
  
