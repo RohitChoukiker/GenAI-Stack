@@ -1,5 +1,5 @@
-export const BASE_URL = "http://localhost:8000/api";
-
+export const BASE_URL = "https://genai-stack-786977254826.europe-west1.run.app/api";
+  
 
 export async function createStackApi({ name, description }) {
   const response = await fetch(`${BASE_URL}/stacks/create-stack`, {
